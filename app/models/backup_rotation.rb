@@ -26,11 +26,11 @@ class BackupRotation < Sequel::Model
     def create_targets(targets, backup)
       targets.each do |target_name, hash|
         hash.each do |type, target_data|
-          exclude = (type == 'exclude' ? true : false)
+          exc = (type == 'exclude' ? true : false)
           target = Target.create(name: target_name)
           target.backup = backup
           target_data.each do |path|
-            TargetGlob.create(line: path, target_id: target.id, exclude: exclude)
+            TargetGlob.create(line: path, target_id: target.id, exclude: exc)
           end
         end
       end
