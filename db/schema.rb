@@ -131,6 +131,7 @@ Sequel.migration do
       primary_key :id
       foreign_key :target_id, :targets, :null=>false
       column :line, "varchar(255)", :null=>false
+      column :exclude, "Boolean", :default=>false, :null=>false
       column :created_at, "timestamp", :null=>false
       column :updated_at, "timestamp"
     end
@@ -203,15 +204,15 @@ Sequel.migration do
       foreign_key :transaction_id, :transactions, :null=>false
     end
     
-    create_table(:transaction_deletions) do
-      foreign_key :id, :transactions, :null=>false
-      foreign_key :transaction_upload_id, :transactions, :null=>false
-    end
-    
-    create_table(:transaction_upload_protocol_objects) do
+    create_table(:protocol_objects_transaction_uploads) do
       primary_key :id
       foreign_key :transaction_upload_id, :transactions, :null=>false
       foreign_key :protocol_object_id, :protocol_objects, :null=>false
+    end
+    
+    create_table(:transaction_deletions) do
+      foreign_key :id, :transactions, :null=>false
+      foreign_key :transaction_upload_id, :transactions, :null=>false
     end
     
     create_table(:transaction_uploads) do
@@ -245,7 +246,7 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160814162040_cr
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160911125002_create_transactions.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160911125955_create_transaction_uploads.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160912133531_create_transaction_deletions.rb')"
-self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160912141849_create_transaction_upload_protocol_objects.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160912141849_create_protocol_objects_transaction_uploads.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160917143553_create_target_globs.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920111431_create_encryption_gpgs.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920111503_create_compression_tar_bzips.rb')"

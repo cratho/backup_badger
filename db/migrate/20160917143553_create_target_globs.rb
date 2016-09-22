@@ -7,6 +7,7 @@ Sequel.migration do
 
       # Attributes
       String      :line, null: false
+      Boolean     :exclude, null: false, default: false
 
       # Timestamps
       DateTime    :created_at, null: false

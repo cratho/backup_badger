@@ -6,10 +6,12 @@ class CompressionTarBZip < Compression
     name      = backup.safe_name
     # path      = File.expand_path(backup.tmp_path)
     path      = backup.tmp_path
-    globfile  = backup.globfile
     # TODO: Error handling
     file = Tempfile.new("#{name}_", File.expand_path(path))
-    cmd = "tar -cjpf #{file.path} --files-from=#{globfile}"
+    files_from = "--files-from=#{backup.globfile}"
+    exclude_from = "--exclude-from=#{backup.globfile(true)}"
+
+    cmd = "tar -cjpf #{file.path} #{files_from} #{exclude_from}"
     puts cmd
     system cmd
 

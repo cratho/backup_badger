@@ -5,9 +5,9 @@ class Target < Sequel::Model
   one_through_one :backup
   one_to_many :target_globs
 
-  def glob_lines
+  def glob_lines(exclude = false)
     out_lines = []
-    target_globs.each do |target_glob|
+    TargetGlob.filter(exclude: exclude, target_id: id).each do |target_glob|
       line = File.expand_path(target_glob.line)
       x = line.gsub('\r\n', '\n')
       x = x.gsub('\r', '\n')

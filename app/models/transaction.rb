@@ -4,14 +4,13 @@ class Transaction < Sequel::Model
   plugin :timestamps
 
   many_to_one :backup_rotation
-  many_to_one :protocol_object
+  many_to_one :folder, key: :protocol_object_id, class: ProtocolObject
   one_through_one :local_file
 
   def process
   end
 
   def folder_protocol
-    folder = protocol_object
     protocol = folder.protocol
     raise "Unable to find protocol for #{self}" unless protocol
     [folder, protocol]

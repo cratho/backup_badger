@@ -5,11 +5,17 @@
   "Backups": {
     "Badgers Backup": {
       "targets": {
-        "Badgers Target" : [
-          "~/Development/backup_badger/app",
-          "~/Development/backup_badger/db",
-          "~/Development/backup_badger/config"
-        ]
+        "Badgers Target" : {
+          "include": [
+            "~/Development/backup_badger/app",
+            "~/Development/backup_badger/db",
+            "~/Development/backup_badger/config"
+          ],
+          "exclude": [
+            "~/Development/backup_badger/app/controllers",
+            "~/Development/backup_badger/app/views"
+          ]
+        }
       },
       "tmp_path": "~/Development/backup_badger/tmp",
       "encapsulation": {

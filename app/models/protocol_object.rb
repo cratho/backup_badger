@@ -16,5 +16,5 @@ class ProtocolObject < Sequel::Model
   many_to_one       :protocol
   one_through_one   :backup_rotation
   one_to_many       :transactions
-  one_to_many       :transaction_upload_protocol_objects
+  one_through_one   :transaction_upload
 end

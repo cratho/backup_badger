@@ -1,7 +1,7 @@
 # Class to model a TransactionUpload
 class TransactionUpload < Transaction
   one_to_many :transaction_deletions
-  one_to_many :transaction_upload_protocol_objects
+  one_through_one :protocol_object
   def process
     # Send via protocol
     folder, protocol = folder_protocol
@@ -23,8 +23,7 @@ class TransactionUpload < Transaction
     po = protocol.send(
       local_file.path, remote_filename, folder
     )
-    TransactionUploadProtocolObject.create(transaction_upload_id: id,
-                                           protocol_object_id: po.id)
+    self.protocol_object = po
     self.completed = true
     save
     verify_md5(po, local_file)

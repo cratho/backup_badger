@@ -27,19 +27,19 @@ class Backup < Sequel::Model
     )
   end
 
-  def glob_lines
+  def glob_lines(exclude = false)
     out_lines = []
     targets.each do |target|
-      lines = target.glob_lines
+      lines = target.glob_lines(exclude)
       out_lines.push(*lines)
     end
     out_lines.uniq
   end
 
-  def globfile
+  def globfile(exclude = false)
     t = Tempfile.new('glob')
     File.open(t.path, 'w+') do |f|
-      f.puts(glob_lines)
+      f.puts(glob_lines(exclude))
     end
     t.close
     t.path
