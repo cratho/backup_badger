@@ -1,0 +1,11 @@
+development:
+  adapter: sqlite # Also accept sqlite3
+  database: db/development.sqlite # Path to db relative to Rails root
+
+test:
+  adapter: sqlite # Also accept sqlite3
+  database: db/test.sqlite # Path to db relative to Rails root
+
+production:
+  adapter: sqlite # Also accept sqlite3
+  database: db/production.sqlite # Path to db relative to Rails root

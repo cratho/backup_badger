@@ -1,0 +1,37 @@
+{
+  "Protocols": {
+    "Google Drive": {
+      "Badgers Google Drive": {
+          "name":                 "Badgers Google Drive",
+          "email":                "you@gmail.com",
+          "application_name":     "Whatever you put in Google Settings: https://developers.google.com/drive/v3/web/about-auth",
+          "application_version":  "0.0.1",
+          "client_id":            "your id",
+          "client_secret":        "your secret",
+          "scope":                "https://www.googleapis.com/auth/drive",
+          "credentials_path":     "Rails.root.join('credentials', 'google_api_credentials.json')",
+          "client_secrets_path":  "Rails.root.join('credentials', 'google_api_client_secrets.json')",
+          "api_version":          "v3",
+          "oob_uri":              "urn:ietf:wg:oauth:2.0:oob",
+          "folder_id":            "the id of the folder within drive you wish to place backups in, leave blank to place in the root of drive"
+      }
+    }
+  },
+  "Encryptions": {
+    "GPG": {
+      "Default": {
+          "username":   "Your name as given to GPG",
+          "comment":    "A Comment",
+          "email":      "your email as given to GPG",
+          "passphrase": "Your GPG passphrase",
+          "extension":  "the file extenstion you sish to use (do not include the .    so 'gpg' not '.gpg'  ",
+          "keysize":    "I use 2048 as a default"
+      }
+    }
+  },
+  "Backup Paths": [
+    "~/Development/backup_badger/app",
+    "~/Development/backup_badger/db",
+    "~/Development/backup_badger/config"
+  ]
+}

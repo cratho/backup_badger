@@ -1,0 +1,42 @@
+{
+  "User": {
+    "email": "test@example.com"
+  },
+  "Backups": {
+    "Badgers Backup": {
+      "targets": {
+        "Badgers Target" : [
+          "~/Development/backup_badger/app",
+          "~/Development/backup_badger/db",
+          "~/Development/backup_badger/config"
+        ]
+      },
+      "tmp_path": "~/Development/backup_badger/tmp",
+      "encapsulation": {
+        "tar.bz2.gpg": {
+          "compression": {
+            "class": "CompressionTarBZip",
+            "name": "TarBZip"
+          },
+          "encryption": {
+            "class": "EncryptionGPG",
+            "name": "GPG"
+          }
+        }
+      }
+    }
+  },
+  "Rotations": {
+    "Badgers GFS Rotation": {
+      "class":    "RotationGFS"
+    }
+  },
+  "BackupRotations": {
+    "Badgers Backup GFS Rotation": {
+      "backup_name":    "Badgers Backup",
+      "rotation_name":  "Badgers GFS Rotation",
+      "protocol_name":  "Badgers Google Drive",
+      "protocol_root":  "/backup_badger/test"
+    }
+  }
+}
