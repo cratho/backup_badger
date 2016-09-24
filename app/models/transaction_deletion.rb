@@ -3,15 +3,17 @@ class TransactionDeletion < Transaction
   many_to_one :transaction_upload
   def process
     return if scheduled_time > Time.now
-    folder = protocol_object
-    protocol = folder.protocol
-    raise "Unable to find protocol for #{self}" unless protocol
+    protocol, transaction_log = protocol_transaction_log
 
-    tu = transaction_upload.transaction_upload_protocol_objects
-    msg = "Unable to find Protocol Object for #{transaction_upload}"
-    raise msg unless tu.first
+    tupo = transaction_upload.protocol_object
 
-    help_process(protocol, tu)
+    begin
+      help_process(protocol, tupo)
+      transaction_log.success!
+    rescue StandardError => e
+      m = "ERROR: Could not delete #{tupo} on #{protocol} #{e}"
+      TransactionLogMessage.create(message: m)
+    end
   end
 
   def help_process(protocol, tu)

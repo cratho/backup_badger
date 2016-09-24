@@ -13,10 +13,10 @@ class RotationGFS < Rotation
 
   # br => backup_rotation
   def help_generate_transactions(br, folder)
-    dailies(br, folder)
-    weeklies(br, folder)
-    monthlies(br, folder)
     yearlies(br, folder)
+    monthlies(br, folder)
+    weeklies(br, folder)
+    dailies(br, folder)
   end
 
   # br => backup_rotation

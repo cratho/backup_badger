@@ -2,19 +2,18 @@
 class TransactionUpload < Transaction
   one_to_many :transaction_deletions
   one_through_one :protocol_object
+
   def process
-    # Send via protocol
-    folder, protocol = folder_protocol
+    folder, protocol, transaction_log = folder_protocol_transaction_log
     begin
       help_process(folder, protocol)
+      transaction_log.success!
     rescue StandardError => e
-      # TODO: Some kind of proper error log
-      puts "ERROR: Could not send #{remote_filename} to #{protocol} #{e}"
-      require 'pp'
-      pp e.backtrace
+      TransactionLogMessage.create(
+        transaction_log_id: transaction_log.id,
+        message: "ERROR: Could not send #{remote_filename} to #{protocol} #{e}"
+      )
     end
-
-    # TODO: Validate transaction
   end
 
   def help_process(folder, protocol)

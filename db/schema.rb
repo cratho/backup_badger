@@ -215,9 +215,25 @@ Sequel.migration do
       foreign_key :transaction_upload_id, :transactions, :null=>false
     end
     
+    create_table(:transaction_logs) do
+      primary_key :id
+      foreign_key :transaction_id, :transactions, :null=>false
+      column :successful, "Boolean", :default=>false, :null=>false
+      column :created_at, "timestamp", :null=>false
+      column :updated_at, "timestamp"
+    end
+    
     create_table(:transaction_uploads) do
       foreign_key :id, :transactions, :null=>false
       column :remote_filename, "varchar(255)", :null=>false
+    end
+    
+    create_table(:transaction_log_messages) do
+      primary_key :id
+      foreign_key :transaction_log_id, :transaction_logs, :null=>false
+      column :message, "Text"
+      column :created_at, "timestamp", :null=>false
+      column :updated_at, "timestamp"
     end
   end
 end
@@ -250,5 +266,7 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160912141849_cr
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160917143553_create_target_globs.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920111431_create_encryption_gpgs.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920111503_create_compression_tar_bzips.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160924171223_create_transaction_logs.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160924171410_create_transaction_log_messages.rb')"
                 end
               end
