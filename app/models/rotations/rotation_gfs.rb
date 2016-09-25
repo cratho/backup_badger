@@ -13,10 +13,13 @@ class RotationGFS < Rotation
 
   # br => backup_rotation
   def help_generate_transactions(br, folder)
-    yearlies(br, folder)
-    monthlies(br, folder)
-    weeklies(br, folder)
-    dailies(br, folder)
+    # Do not generate a daily if there is a weekly to do etc.
+    # If the script is run multiple times on the same day
+    #   it will progress a level farther each time
+    return if yearlies(br, folder)
+    return if monthlies(br, folder)
+    return if weeklies(br, folder)
+    return if dailies(br, folder)
   end
 
   # br => backup_rotation
@@ -29,7 +32,8 @@ class RotationGFS < Rotation
 
   # br => backup_rotation
   def weeklies(br, folder)
-    sched_time = Date.today.at_beginning_of_week
+    today = Date.today
+    sched_time = today.at_beginning_of_week
     deletion_time = (sched_time + 7)
     n = sched_time.cweek.to_s.rjust(2, '0')
     create_transactions br, folder, "WEEKLY_#{n}", deletion_time, sched_time
@@ -37,35 +41,35 @@ class RotationGFS < Rotation
 
   # br => backup_rotation
   def monthlies(br, folder)
-    now = Date.today
-    sched_time = Date.new(now.year, now.month, 1)
-    deletion_time = Date.new(now.year, now.month + 1, 1)
+    today = Date.today
+    sched_time = Date.new(today.year, today.month, 1)
+    deletion_time = Date.new(today.year, today.month + 1, 1)
     n = sched_time.month.to_s.rjust(2, '0')
     create_transactions br, folder, "MONTHLY_#{n}", deletion_time, sched_time
   end
 
   # br => backup_rotation
   def yearlies(br, folder)
-    now = Date.today
-    sched_time = Date.new(now.year, 1, 1)
-    deletion_time = Date.new(now.year + 1, 1, 1)
+    today = Date.today
+    sched_time = Date.new(today.year, 1, 1)
+    deletion_time = Date.new(today.year + 1, 1, 1)
     n = sched_time.year.to_s
     create_transactions br, folder, "YEARLY_#{n}", deletion_time, sched_time
   end
 
   def create_transactions(backup_rotation,
-                          folder, prefix,
-                          deletion_time = nil,
-                          scheduled_time = Time.now)
-    local_file = backup_rotation.backup.encapsulate_targets
-    name = safe_name(backup_rotation, prefix)
+                          folder, prefix, deletion_time = nil,
+                          sched_time = Time.now)
 
-    t = create_upload_transaction(
-      backup_rotation, folder, name, scheduled_time
+    t = create_transaction_upload(
+      backup_rotation, folder, safe_name(backup_rotation, prefix), sched_time
     )
 
-    t.local_file = local_file
-    create_deletion_transaction deletion_time, t
+    if t
+      t.local_file = backup_rotation.backup.encapsulate_targets
+      return create_transaction_deletion deletion_time, t
+    end
+    nil
   end
 
   def safe_name(backup_rotation, prefix)
@@ -73,27 +77,45 @@ class RotationGFS < Rotation
     "#{prefix}_#{sn}"
   end
 
-  def create_deletion_transaction(scheduled_time, upload_transaction)
-    TransactionDeletion.find_or_create(
-      backup_rotation_id:     upload_transaction.backup_rotation_id,
-      protocol_object_id:     upload_transaction.protocol_object_id,
-      transaction_upload_id:  upload_transaction.id,
-      scheduled_date:         scheduled_time
+  def create_transaction_deletion(sched_time, transaction_upload)
+    return nil if find_td(sched_time, transaction_upload)
+    TransactionDeletion.create(
+      backup_rotation_id:     transaction_upload.backup_rotation_id,
+      protocol_object_id:     transaction_upload.protocol_object_id,
+      transaction_upload_id:  transaction_upload.id,
+      scheduled_date:         sched_time
     ) do |a|
-      a.scheduled_time = scheduled_time
+      a.scheduled_time = sched_time
     end
   end
 
-  def create_upload_transaction(backup_rotation, protocol_object,
-                                remote_filename,
-                                scheduled_time = Time.now)
-    TransactionUpload.find_or_create(
+  def find_td(sched_time, transaction_upload)
+    TransactionDeletion.find(
+      backup_rotation_id:     transaction_upload.backup_rotation_id,
+      protocol_object_id:     transaction_upload.protocol_object_id,
+      transaction_upload_id:  transaction_upload.id,
+      scheduled_date:         sched_time
+    )
+  end
+
+  def create_transaction_upload(backup_rotation, protocol_object,
+                                remote_filename, sched_time = Time.now)
+    return nil if find_tu(backup_rotation, protocol_object, sched_time)
+    TransactionUpload.create(
       backup_rotation_id:   backup_rotation.id,
       protocol_object_id:   protocol_object.id,
-      scheduled_date:       scheduled_time,
-      remote_filename:      remote_filename
+      scheduled_date:       sched_time
     ) do |a|
-      a.scheduled_time = scheduled_time
+      a.scheduled_time = sched_time
+      a.remote_filename = remote_filename
     end
+  end
+
+  def find_tu(backup_rotation, protocol_object, sched_time)
+    TransactionUpload.find(
+      backup_rotation_id:   backup_rotation.id,
+      protocol_object_id:   protocol_object.id,
+      scheduled_date:       sched_time
+    )
   end
 end
