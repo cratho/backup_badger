@@ -1,0 +1,10 @@
+%h1 Last #{@num_transactions} Transactions
+%table.table
+  %tbody
+    %tr
+    - @transactions.first.keys.each do |header|
+      %th= header
+    - @transactions.each do |t|
+      %tr
+        - t.each do |key, value|
+          %td= value
